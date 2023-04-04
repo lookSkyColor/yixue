@@ -90,7 +90,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 // 1. 通过规则判断手机号
                 if (!judgePhoneNums(phoneNums)) {
                     return;
-                } // 2. 通过sdk发送短信验证
+                }
+                // 2. 通过sdk发送短信验证
                 //SMSSDK.getVerificationCode("86", phoneNums);
 
 
