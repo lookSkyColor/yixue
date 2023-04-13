@@ -34,35 +34,44 @@ public class MainActivity extends FragmentActivity implements RadioGroup.OnCheck
     private RadioButton main_user;
 
     private FragmentManager fragmentManager;
+    private HomeFragment mHomeFragment;
+    private OrderFragment mOrderFragment;
+    private UserFragment mUserFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ViewUtils.inject(this);
-
+        initFragment();
         fragmentManager = getSupportFragmentManager();
 
         main_index.setOnCheckedChangeListener(this);
         main_home.setChecked(true);
-        changeFragment(new HomeFragment(), false);
+        changeFragment(mHomeFragment, false);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         switch (checkedId) {
             case R.id.main_home:
-                changeFragment(new HomeFragment(), true);
+                changeFragment(mHomeFragment, true);
                 break;
             case R.id.main_order:
-                changeFragment(new OrderFragment(), true);
+                changeFragment(mOrderFragment, true);
                 break;
             case R.id.main_user:
-                changeFragment(new UserFragment(), true);
+                changeFragment(mUserFragment, true);
                 break;
             default:
                 break;
         }
+    }
+
+    private void initFragment(){
+        mHomeFragment = new HomeFragment();
+        mOrderFragment = new OrderFragment();
+        mUserFragment = new UserFragment();
     }
 
     /**
@@ -85,8 +94,4 @@ public class MainActivity extends FragmentActivity implements RadioGroup.OnCheck
         //3、提交事务
         transaction.commit();
     }
-
-
-
-
 }

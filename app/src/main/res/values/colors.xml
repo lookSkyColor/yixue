@@ -15,7 +15,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#696969</color>
-    <color name="app_main_color">#007ffc</color>
+    <color name="app_main_color">#FFBB86FC</color>
 
     <color name="background">#f6f6f6</color>
     <color name="front_color">#FFFFFFFF</color>

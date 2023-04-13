@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -84,7 +85,7 @@ public abstract class BaseSQLiteHelper<T> extends SQLiteOpenHelper {
      * @return
      */
     @SneakyThrows
-    protected int insert(T t) {
+    protected int insert(T t) throws IllegalAccessException {
         ContentValues values = new ContentValues();
         Class<T> tClass = (Class<T>) t.getClass();
         Field[] fields = tClass.getDeclaredFields();
@@ -106,7 +107,9 @@ public abstract class BaseSQLiteHelper<T> extends SQLiteOpenHelper {
     protected int delete(String whereClause, Object... args) {
         String[] params = null;
         if (args != null) {
-            params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            }
         }
         return wdb.delete(TABLE_NAME, whereClause, params);
     }
@@ -120,10 +123,12 @@ public abstract class BaseSQLiteHelper<T> extends SQLiteOpenHelper {
      * @return
      */
     @SneakyThrows
-    protected int update(T t, String whereClause, Object... args) {
+    protected int update(T t, String whereClause, Object... args) throws IllegalAccessException {
         String[] params = null;
         if (args != null) {
-            params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            }
         }
         ContentValues values = new ContentValues();
         Class<T> tClass = (Class<T>) t.getClass();
@@ -146,10 +151,12 @@ public abstract class BaseSQLiteHelper<T> extends SQLiteOpenHelper {
      * @return 返回查询出的列表
      */
     @SneakyThrows
-    protected List<T> query(String sql, Object... args) {
+    protected List<T> query(String sql, Object... args) throws IllegalAccessException, NoSuchFieldException, InstantiationException {
         String[] params = null;
         if (args != null) {
-            params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                params = Arrays.stream(args).map(o -> o + "").collect(Collectors.toList()).toArray(new String[args.length]);
+            }
         }
         Cursor cursor = rdb.rawQuery(sql, params);
         List<T> list = new ArrayList<>();

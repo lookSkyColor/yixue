@@ -16,9 +16,10 @@ import java.util.List;
  * @date: 2023/2/10 23:07
  * @author: 骆家腾
  */
-public class ShoppingCartImpl extends BaseSQLiteHelper<ShoppingCart> implements ShoppingCartDao {
+public class ShoppingCartImpl  {
+        //extends BaseSQLiteHelper<ShoppingCart> implements ShoppingCartDao {
 
-    public static ShoppingCartImpl getInstance(Context context) {
+    /*public static ShoppingCartImpl getInstance(Context context) {
         if (helper == null) {
             helper = new ShoppingCartImpl(context, "shoppingcart", 1);
         }
@@ -49,11 +50,11 @@ public class ShoppingCartImpl extends BaseSQLiteHelper<ShoppingCart> implements 
     }
 
 
-    /**
+    *//**
      * 通过用户、商家 查询购物车信息
      *
      * @return
-     */
+     *//*
     @Override
     public List<ShoppingCart> queryByGoodsByUserIdShopId(String userId, String shopId) {
         String sql = "select * from shoppingcart where userId = ?" + " and shopId = ?";
@@ -70,13 +71,13 @@ public class ShoppingCartImpl extends BaseSQLiteHelper<ShoppingCart> implements 
     }
 
 
-    /**
+    *//**
      * 向购物车中添加商品
      * 如果已经有同样的商品，对count++；
      *
      * @param shoppingCart
      * @return
-     */
+     *//*
     @Override
     public int insertGoods(ShoppingCart shoppingCart) {
         ShoppingCart goods = queryOne(shoppingCart);
@@ -87,13 +88,13 @@ public class ShoppingCartImpl extends BaseSQLiteHelper<ShoppingCart> implements 
         }
     }
 
-    /**
+    *//**
      * 删除商品通过用户、商家、商品id
      * 对count进行更新
      *
      * @param shoppingCart
      * @return
-     */
+     *//*
     @Override
     public int deleteGoods(ShoppingCart shoppingCart) {
         ShoppingCart goods = queryOne(shoppingCart);
@@ -120,5 +121,5 @@ public class ShoppingCartImpl extends BaseSQLiteHelper<ShoppingCart> implements 
         delete("userId = ? and shopId = ?", userId, shopId);
     }
 
-
+*/
 }

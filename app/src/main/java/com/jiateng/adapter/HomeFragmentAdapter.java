@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
@@ -65,11 +66,21 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
     private static final int LIST = 1;
     private Context context;
     private ArrayList<School> shopInfoData;
+    private ArrayList<String> mBannerList;
     private MyOnClickListener myOnClickListener;
 
-    public HomeFragmentAdapter(Context context, ArrayList<School> shopInfoData) {
+    public void setShopInfoData(ArrayList<School> shopInfoData) {
+        this.shopInfoData = shopInfoData;
+    }
+
+    public void setMBannerList(ArrayList<String> mBannerList) {
+        this.mBannerList = mBannerList;
+    }
+
+    public HomeFragmentAdapter(Context context, ArrayList<School> shopInfoData, ArrayList<String> bannerList) {
         this.context = context;
         this.shopInfoData = shopInfoData;
+        this.mBannerList = bannerList;
     }
 
     @NonNull
@@ -88,56 +99,7 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == BANNER) {
             BannerHolder bannerHolder = (BannerHolder) holder;
-            FormBody.Builder builder = new FormBody.Builder();
-            int corporationId = SharedPreferencesUtil.getInt(null, "corporationId", 0);
-            builder.add("corporationId", String.valueOf(corporationId));
-            FormBody formBody = builder.build();
-            final Request request = new Request.Builder()
-                    .post(formBody)
-                    .url("http://192.168.0.128:8080/home/toHome")
-                    .build();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        if(0 !=  SharedPreferencesUtil.getLong(context,"corporationId",0L)){
-
-                        }
-                        OkHttpClient client = new OkHttpClient.Builder()
-                                .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
-                                .build();
-                        Response response = client.newCall(request).execute();
-                        if (response.isSuccessful()) {
-                            String s = response.body().string();
-                            Log.e("TAG", "Post请求String同步响应success==" + s);
-
-                            Gson gson = new Gson();
-                            JsonBean jsonBean  = gson.fromJson(s, new TypeToken<JsonBean<ArrayList<BannerInfo>>>() {}.getType());
-
-                           ArrayList<BannerInfo> bannerInfos = (ArrayList<BannerInfo>) jsonBean.getResult();
-                            if (bannerInfos !=null && !bannerInfos.isEmpty()){
-                                //TODO 修改为从服务器请求的数据，删除mokaImage这个方法
-                                bannerHolder.setData(mokaImage(bannerInfos));
-                            }else {
-                            }
-
-
-                        } else {
-                            Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
-                            //TODO 修改为从服务器请求的数据，删除mokaImage这个方法
-
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        //TODO 修改为从服务器请求的数据，删除mokaImage这个方法
-                        Log.e("TAG", "Post请求String同步响应failure==" + e.getMessage());
-                    }
-                }
-            }).start();
-
-
+            bannerHolder.setData(mBannerList);
         } else {
             ListHolder listHolder = (ListHolder) holder;
             int index = position - 1;
@@ -148,10 +110,10 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
 
-        if (null == shopInfoData){
+        if (null == shopInfoData) {
             return 1;
         }
-        return 1 + (shopInfoData.isEmpty()?0:shopInfoData.size());
+        return 1 + (shopInfoData.isEmpty() ? 0 : shopInfoData.size());
     }
 
     @Override
@@ -208,59 +170,23 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
      */
     class BannerHolder extends RecyclerView.ViewHolder {
         private Banner banner;
-
         public BannerHolder(Context context, View itemView) {
             super(itemView);
             banner = itemView.findViewById(R.id.banner);
         }
 
         public void setData(ArrayList<String> data) {
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    banner.setAdapter(new BannerImageAdapter<String>(data) {
-                        @Override
-                        public void onBindView(BannerImageHolder holder, String data, int position, int size) {
-
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                            Bitmap bitmap =
-                                    getHttpBitmap(data);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                 public void run() {
-                                    holder.imageView.setImageBitmap(bitmap);
-                                }
-                            });
-
-                                }
-                            }).start();
-
-                        }
-                    });
-
-
             banner.isAutoLoop(true);
             banner.setIndicator(new CircleIndicator(context));
             banner.start();
+            banner.setAdapter(new BannerImageAdapter<String>(data) {
+                @Override
+                public void onBindView(BannerImageHolder holder, String data, int position, int size) {
+                    Glide.with(context).load(data).into(holder.imageView);
                 }
             });
         }
-
     }
-    final Handler mHandler = new Handler();
-
-    private Thread mUiThread;
-
-    public final void runOnUiThread(Runnable action) {
-            if (Thread.currentThread() != mUiThread) {
-                    mHandler.post(action);
-                } else {
-                    action.run();
-                 }
-         }
 
     public void setMyOnClickListener(MyOnClickListener myOnClickListener) {
         this.myOnClickListener = myOnClickListener;
@@ -272,45 +198,4 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
     public interface MyOnClickListener {
         void viewClick(View view, int position);
     }
-
-    //TODO 将来获取banner从服务器中请求的数据后，删除这些数据
-    private ArrayList<String> mokaImage( List<BannerInfo> BannerInfo) {
-        ArrayList<String> data = new ArrayList<>();
-        for (BannerInfo bannerInfo:BannerInfo) {
-            data.add(bannerInfo.getUrl());
-        }
-        return data;
-    }
-
-
-    /**
-     * 从服务器取图片
-     *http://bbs.3gstdy.com
-     * @param url
-     * @return
-     */
-    public static Bitmap getHttpBitmap(String url) {
-        URL myFileUrl = null;
-        Bitmap bitmap = null;
-        try {
-            Log.d(TAG, url);
-            myFileUrl = new URL(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        try {
-
-            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
-            conn.setConnectTimeout(0);
-            conn.setDoInput(true);
-            //conn.connect();
-            InputStream is = conn.getInputStream();
-            bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
-
 }

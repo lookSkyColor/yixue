@@ -2,8 +2,10 @@ package com.jiateng.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +41,9 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -71,7 +75,7 @@ public class ShopFragment extends BaseFragment {
     public ShopFragment(School shopInfo) {
         super();
         this.shopId = shopInfo.getId()+"";
-        this.userId = SharedPreferencesUtil.getString(context, "userId", null);
+        this.userId = String.valueOf(SharedPreferencesUtil.getLong(context, "userId", 0L));
         this.goodsList = shopInfo.getGoodsList();
     }
 
@@ -83,11 +87,11 @@ public class ShopFragment extends BaseFragment {
         initGoodsData();
         initGoodsView();
         initGoodsListener();
-        shoppingCartDao = ShoppingCartImpl.getInstance(context);
+        /*shoppingCartDao = ShoppingCartImpl.getInstance(context);
         carInfo.setOnClickListener(v -> {
             shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
             showBottomSheet();
-        });
+        });*/
         return view;
     }
 
@@ -110,7 +114,7 @@ public class ShopFragment extends BaseFragment {
     }
 
     public void initCarData() {
-        shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
+        //shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
     }
 
     /**
@@ -137,8 +141,8 @@ public class ShopFragment extends BaseFragment {
         View view = LayoutInflater.from(context).inflate(R.layout.layout_bottom_sheet, (ViewGroup) getActivity().getWindow().getDecorView(), false);
         //清空购物车
         ((TextView) view.findViewById(R.id.cleanShoppingCart)).setOnClickListener(v -> {
-            shoppingCartDao.clean(userId, shopId);
-            shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
+            /*shoppingCartDao.clean(userId, shopId);
+            shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);*/
             adapter.notifyDataSetChanged();
             rAdapter.notifyDataSetChanged();
             bottomSheetLayout.dismissSheet();
@@ -150,7 +154,7 @@ public class ShopFragment extends BaseFragment {
         adapter.setOnSelectListener(new ShoppingCartAdapter.OnSelectListener() {
             @Override
             public void onSelectAdd(int position, ShoppingCart shoppingCart) {
-                shoppingCartDao.insertGoods(shoppingCart);
+                //shoppingCartDao.insertGoods(shoppingCart);
                 adapter.notifyDataSetChanged();
                 goodsPrice.setText(getShopPrice(shoppingCart));
             }
@@ -158,11 +162,11 @@ public class ShopFragment extends BaseFragment {
             @Override
             public void onSelectReduce(int position) {
                 ShoppingCart shoppingCart = shoppingCartsData.get(position);
-                shoppingCartDao.deleteGoods(shoppingCart);
-                ShoppingCart hasGoods = shoppingCartDao.queryOne(shoppingCart);
+               // shoppingCartDao.deleteGoods(shoppingCart);
+               /* ShoppingCart hasGoods = shoppingCartDao.queryOne(shoppingCart);
                 if (hasGoods == null) {
                     shoppingCartsData.remove(position);
-                }
+                }*/
                 adapter.notifyDataSetChanged();
                 rAdapter.notifyDataSetChanged();
                 goodsPrice.setText(getShopPrice(shoppingCart));
@@ -183,7 +187,9 @@ public class ShopFragment extends BaseFragment {
      * TODO 从网络上请求数据
      */
     private void initGoodsData() {
+
         categories = goodsList.stream().map(goods -> new Category(goods.getCategory())).distinct().collect(Collectors.toList());
+
         goodsList = goodsList;
     }
 
@@ -225,9 +231,9 @@ public class ShopFragment extends BaseFragment {
 //                String goods  Id = data.get(position).getCategory() + data.get(position).getName();
 //                double price = Double.parseDouble(((TextView) holder.getView(R.id.tvPrice)).getText().toString());
                 ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(),data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(), data.get(position).getSubjectNumber());
-                shoppingCartDao.insertGoods(shoppingCart);
+               // shoppingCartDao.insertGoods(shoppingCart);
                 ((ImageView) holder.getView(R.id.addToCar)).setVisibility(View.VISIBLE);
-                ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
+               // ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
                 goodsPrice.setText(getShopPrice(shoppingCart));
                 rAdapter.notifyDataSetChanged();
             }
@@ -235,10 +241,11 @@ public class ShopFragment extends BaseFragment {
             @Override
             public void reduceClick(ShopRecyclerHolder holder, List<Subject> data, int position) {
                 ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(), data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(),  data.get(position).getSubjectNumber());
-                shoppingCartDao.deleteGoods(shoppingCart);
-                ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart) == null ? "" : shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
+               // shoppingCartDao.deleteGoods(shoppingCart);
+                //((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart) == null ? "" : shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
                 goodsPrice.setText(getShopPrice(shoppingCart));
                 rAdapter.notifyDataSetChanged();
+
             }
         });
         lAdapter.setOnItemClickListener(new ShopRecyclerViewAdater.OnItemClickListener() {
@@ -289,11 +296,12 @@ public class ShopFragment extends BaseFragment {
 
     private String getShopPrice(ShoppingCart shoppingCart) {
         double money = 0.0;
-        List<ShoppingCart> shoppingCarts = shoppingCartDao.queryByGoodsByUserIdShopId(shoppingCart.getUserId(), shoppingCart.getShopId());
+       /* List<ShoppingCart> shoppingCarts = shoppingCartDao.queryByGoodsByUserIdShopId(shoppingCart.getUserId(), shoppingCart.getShopId());
         for (ShoppingCart cart : shoppingCarts) {
             money = money + cart.getGoodsPrice() * cart.getGoodsCount().intValue();
         }
-        return String.format("%.1f", money);
+        return String.format("%.1f", money);*/
+        return "";
     }
 
 
@@ -380,7 +388,7 @@ public class ShopFragment extends BaseFragment {
         @Override
         public void convert(ShopRecyclerHolder holder, final int position) {
             ((TextView) holder.getView(R.id.tvName)).setText(getmData().get(position).getSubjectName());
-            ((TextView) holder.getView(R.id.tvPrice)).setText(String.format("%.1f", getmData().get(position).getSubjectPrice()));
+            ((TextView) holder.getView(R.id.tvPrice)).setText(String.valueOf(getmData().get(position).getSubjectPrice()));
             ((TextView) holder.getView(R.id.shop_goods_count)).setText(getmData().get(position).getSubjectNumber() + "");
             PicassoUtil.setImage(getmData().get(position).getSubjectImgUrl(), (AppCompatImageView) holder.getView(R.id.tv_image));
 
@@ -389,15 +397,15 @@ public class ShopFragment extends BaseFragment {
             ImageView reduce = holder.getView(R.id.reduceFromCar);
             goodsId = getmData().get(position).getCategory() + getmData().get(position).getSubjectName();
             ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, getmData().get(position).getId()+"", getmData().get(position).getSubjectName(), getmData().get(position).getSubjectPrice(), getmData().get(position).getSubjectImgUrl(), 1);
-            ShoppingCart goods = shoppingCartDao.queryOne(shoppingCart);
-            if (goods == null) {
+            //ShoppingCart goods = shoppingCartDao.queryOne(shoppingCart);
+            /*if (goods == null) {
                 reduce.setVisibility(View.GONE);
                 addCount.setText("");
             } else {
                 reduce.setVisibility(View.VISIBLE);
                 addCount.setText(goods.getGoodsCount() + "");
                 goodsPrice.setText(getShopPrice(shoppingCart));
-            }
+            }*/
             add.setOnClickListener(v -> {
                 if (shoppingItemClickListener != null) {
                     shoppingItemClickListener.addClick(holder, getmData(), position);

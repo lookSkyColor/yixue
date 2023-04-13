@@ -70,11 +70,11 @@ public class GoodsActivity extends Activity {
         price = goodsInfo.getGoodsPrice();
         goodsName = goodsInfo.getGoodsName();
         goodsImgUrl = goodsInfo.getGoodsImgUrl();
-        shoppingCartDao = ShoppingCartImpl.getInstance(GoodsActivity.this);
+        //shoppingCartDao = ShoppingCartImpl.getInstance(GoodsActivity.this);
         initCarData();
         shoppingCartPrice.setText(getShopPrice(goodsInfo));
         currentGoodsName.setText(goods.getSubjectName());
-        currentGoodsPrice.setText(goods.getSubjectPrice());
+        currentGoodsPrice.setText(String.valueOf(goods.getSubjectPrice()));
         PicassoUtil.setImage(goods.getSubjectImgUrl(), currentGoodsImg);
         adapter = new ShoppingCartAdapter(GoodsActivity.this, shoppingCartsData);
 
@@ -87,14 +87,14 @@ public class GoodsActivity extends Activity {
         addGoodsButton.setOnClickListener(v -> {
             initCarData();
             ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, goodsId, goodsName, price, goodsImgUrl, 1);
-            shoppingCartDao.insertGoods(shoppingCart);
+            //shoppingCartDao.insertGoods(shoppingCart);
             shoppingCartPrice.setText(getShopPrice(shoppingCart));
         });
     }
 
 
     public void initCarData() {
-        shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
+       // shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
     }
 
     /**
@@ -121,8 +121,8 @@ public class GoodsActivity extends Activity {
         ListView carList = view.findViewById(R.id.car_list);
         //清空购物车
         ((TextView) view.findViewById(R.id.cleanShoppingCart)).setOnClickListener(v -> {
-            shoppingCartDao.clean(userId, shopId);
-            shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
+            //shoppingCartDao.clean(userId, shopId);
+           // shoppingCartsData = shoppingCartDao.queryByGoodsByUserIdShopId(userId, shopId);
             adapter.notifyDataSetChanged();
             bottomSheetLayout.dismissSheet();
             shoppingCartPrice.setText("¥0.0");
@@ -131,7 +131,7 @@ public class GoodsActivity extends Activity {
         adapter.setOnSelectListener(new ShoppingCartAdapter.OnSelectListener() {
             @Override
             public void onSelectAdd(int position, ShoppingCart shoppingCart) {
-                shoppingCartDao.insertGoods(shoppingCart);
+               // shoppingCartDao.insertGoods(shoppingCart);
                 adapter.notifyDataSetChanged();
 
                 shoppingCartPrice.setText(getShopPrice(shoppingCart));
@@ -140,11 +140,11 @@ public class GoodsActivity extends Activity {
             @Override
             public void onSelectReduce(int position) {
                 ShoppingCart shoppingCart = shoppingCartsData.get(position);
-                shoppingCartDao.deleteGoods(shoppingCart);
-                ShoppingCart hasGoods = shoppingCartDao.queryOne(shoppingCart);
-                if (hasGoods == null) {
+                //shoppingCartDao.deleteGoods(shoppingCart);
+                //ShoppingCart hasGoods = shoppingCartDao.queryOne(shoppingCart);
+                /*if (hasGoods == null) {
                     shoppingCartsData.remove(position);
-                }
+                }*/
 
                 shoppingCartPrice.setText(getShopPrice(shoppingCart));
                 adapter.notifyDataSetChanged();
@@ -159,11 +159,12 @@ public class GoodsActivity extends Activity {
     }
 
     private String getShopPrice(ShoppingCart shoppingCart) {
-        double money = 0.0;
+        /*double money = 0.0;
         List<ShoppingCart> shoppingCarts = shoppingCartDao.queryByGoodsByUserIdShopId(shoppingCart.getUserId(), shoppingCart.getShopId());
         for (ShoppingCart cart : shoppingCarts) {
             money = money + cart.getGoodsPrice() * cart.getGoodsCount().intValue();
         }
-        return String.format("%.1f", money);
+        return String.format("%.1f", money);*/
+        return "";
     }
 }

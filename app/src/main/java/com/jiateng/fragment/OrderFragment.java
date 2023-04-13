@@ -47,18 +47,6 @@ public class OrderFragment extends BaseFragment implements OrderAdapter.OrderIte
     @Override
     protected void initData() {
         super.initData();
-//        OrderApi orderApi = retrofitUtils.getApiService(OrderApi.class);
-//        orderApi.getHistoryOrderByUserId("101").enqueue(new Callback<ResponseDate<Order>>() {
-//            @Override
-//            public void onResponse(Call<ResponseDate<Order>> call, Response<ResponseDate<Order>> response) {
-//                System.out.println("success");
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseDate<Order>> call, Throwable t) {
-//                System.out.println("error");
-//            }
-//        });
         orders = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             Order order = new Order();

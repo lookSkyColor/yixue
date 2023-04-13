@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,9 +18,8 @@ import com.jiateng.adapter.HomeFragmentAdapter;
 import com.jiateng.bean.BannerInfo;
 import com.jiateng.bean.JsonBean;
 import com.jiateng.bean.School;
-import com.jiateng.bean.ShopInfo;
+import com.jiateng.common.Constant;
 import com.jiateng.common.base.BaseFragment;
-import com.jiateng.common.utils.MockData;
 import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,88 +49,130 @@ public class HomeFragment extends BaseFragment {
     private HomeFragmentAdapter adapter;
 
     private ArrayList<School> schools;
+    private ArrayList<String> mBannerList;
 
     @Override
     protected View initView() {
         View view = View.inflate(context, R.layout.fragment_home, null);
         ViewUtils.inject(this, view);
+        initRecycleView();
         return view;
     }
 
     @Override
     protected void initData() {
-        super.initData();
-
+        initBannerData();
         long userId = SharedPreferencesUtil.getLong(context, "userId", 0L);
-        if(0 != userId){
-            FormBody.Builder builder = new FormBody.Builder();
-            builder.add("userId", String.valueOf(userId));
-            FormBody formBody = builder.build();
-            final Request request = new Request.Builder()
-                    .post(formBody)
-                    .url("http://192.168.0.128:8080/school/selectSchoolByUserId")
-                    .build();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        if(0 !=  SharedPreferencesUtil.getLong(null,"corporationId",0L)){
-
-                        }
-                        OkHttpClient client = new OkHttpClient.Builder()
-                                .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
-                                .build();
-                        Response response = client.newCall(request).execute();
-                        if (response.isSuccessful()) {
-                            String s = response.body().string();
-                            Log.e("TAG", "Post请求String同步响应success==" + s);
-
-                            Gson gson = new Gson();
-                            JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<List<School>>>() {}.getType());
-
-                           schools = (ArrayList<School>) jsonBean.getResult();
-                            getActivity().runOnUiThread(new Runnable()
-                            {
-                                public void run()
-                                {
-                                    //TODO mock data
-                                    //ArrayList<ShopInfo> shopInfoData = MockData.getShopInfoList();
-                                    adapter = new HomeFragmentAdapter(context, schools);
-                                    recyclerView.setAdapter(adapter);
-                                    adapter.setMyOnClickListener((view, position) -> {
-                                        int index = position - 1;
-                                        Intent intent = new Intent(context, ShopActivity.class);
-                                        Bundle bundle = new Bundle();
-                                        bundle.putSerializable("shopInfo", schools.get(index));
-                                        intent.putExtras(bundle);
-                                        startActivity(intent);
-                                    });
-                                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-                                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                                    linearLayoutManager.setReverseLayout(false);
-                                    recyclerView.setLayoutManager(linearLayoutManager);
-                                }
-
-                            });
-
-
-
-                        } else {
-                            Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
-
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.e("TAG", "Post请求String同步响应failure==" + e.getMessage());
-                    }
-                }
-            }).start();
-        }else {
+        if (0 != userId) {
+            getSchoolData(userId);
+        } else {
             Intent intent = new Intent(context, LoginActivity.class);
             startActivity(intent);
         }
-
     }
+
+    private void initRecycleView() {
+        adapter = new HomeFragmentAdapter(context, schools, mBannerList);
+        recyclerView.setAdapter(adapter);
+        adapter.setMyOnClickListener((view, position) -> {
+            int index = position - 1;
+            Intent intent = new Intent(context, ShopActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("shopInfo", schools.get(index));
+            intent.putExtras(bundle);
+            startActivity(intent);
+        });
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setReverseLayout(false);
+        recyclerView.setLayoutManager(linearLayoutManager);
+    }
+
+    private void getSchoolData(long userId) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add("userId", String.valueOf(userId));
+        FormBody formBody = builder.build();
+        final Request request = new Request.Builder()
+                .post(formBody)
+                .url(Constant.SCHOOL_URL)
+                .build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.e("TAG", "onFailure" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String s = response.body().string();
+                    Log.e("TAG", "Post请求String同步响应success==" + s);
+
+                    Gson gson = new Gson();
+                    JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<List<School>>>() {
+                    }.getType());
+                    schools = (ArrayList<School>) jsonBean.getResult();
+                    adapter.setShopInfoData(schools);
+                    recyclerView.post(() -> adapter.notifyDataSetChanged());
+                } else {
+                    Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
+                }
+            }
+        });
+    }
+
+    private void initBannerData() {
+        FormBody.Builder builder = new FormBody.Builder();
+        int corporationId = SharedPreferencesUtil.getInt(getContext(), "corporationId", 0);
+        builder.add("corporationId", String.valueOf(corporationId));
+        FormBody formBody = builder.build();
+        final Request request = new Request.Builder()
+                .post(formBody)
+                .url(Constant.BANNER_URL)
+                .build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.e("TAG", "onFailure" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String s = response.body().string();
+                    Log.e("TAG", "Post请求String同步响应success==" + s);
+
+                    Gson gson = new Gson();
+                    JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<ArrayList<BannerInfo>>>() {
+                    }.getType());
+
+                    ArrayList<BannerInfo> bannerInfos = (ArrayList<BannerInfo>) jsonBean.getResult();
+                    if (bannerInfos != null && !bannerInfos.isEmpty()) {
+                        mBannerList = makeImage(bannerInfos);
+                        adapter.setMBannerList(mBannerList);
+                        recyclerView.post(() -> adapter.notifyDataSetChanged());
+                    } else {
+
+                    }
+                } else {
+                    Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
+                }
+            }
+        });
+    }
+
+    private ArrayList<String> makeImage(List<BannerInfo> BannerInfo) {
+        ArrayList<String> data = new ArrayList<>();
+        for (BannerInfo bannerInfo : BannerInfo) {
+            data.add(bannerInfo.getUrl());
+        }
+        return data;
+    }
+
 }

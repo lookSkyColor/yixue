@@ -1,21 +1,13 @@
 package com.jiateng.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,30 +15,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.alibaba.fastjson.JSON;
-
-
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
 import com.jiateng.bean.JsonBean;
 import com.jiateng.bean.UserInfo;
-import com.jiateng.common.utils.MockData;
 import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.jiateng.common.widget.AppTitleView;
-import com.jiateng.fragment.UserFragment;
 import com.lidroid.xutils.ViewUtils;
-import com.lidroid.xutils.db.annotation.NotNull;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
-
-
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import cn.hutool.aop.interceptor.SpringCglibInterceptor;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -55,7 +35,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -68,24 +47,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // 验证码输入框
     private EditText inputCodeEt;
 
-    // 获取验证码按钮
-    private Button requestCodeBtn;
-
     // 登录按钮
     private Button commitBtn;
 
     //倒计时
     int i = 30;
 
-    private Button timeButton;
-
-    private EditText edit_input;
-    private Button btn_send;
-    private String inputContent;
-
-    private FragmentManager manager;
-    private FragmentTransaction transaction;
-
+    private TextView timeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginTitle.onClickTitleListener(v -> {
             finish();
         });
-        timeButton = (Button) findViewById(R.id.login_request_code_btn);
+        timeButton = findViewById(R.id.login_request_code_btn);
         //new倒计时对象,总共的时间,每隔多少秒更新一次时间
         final MyCountDownTimer myCountDownTimer = new MyCountDownTimer(60000,1000);
 
@@ -140,18 +108,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-
     private void init() {
         inputPhoneEt = (EditText) findViewById(R.id.login_input_phone_et);
         inputCodeEt = (EditText) findViewById(R.id.login_input_code_et);
-        requestCodeBtn = (Button) findViewById(R.id.login_request_code_btn);
         commitBtn = (Button) findViewById(R.id.login_commit_btn);
-        requestCodeBtn.setOnClickListener(this);
         commitBtn.setOnClickListener(this);
-
     }
-
-
 
     @Override
     public void onClick(View v) {
@@ -216,8 +178,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         }).start();
-
-
     }
 
     private boolean judgePhoneNums(String phoneNums) {
@@ -284,10 +244,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             timeButton.setClickable(true);
         }
     }
-
-
-
-
 }
 
 
