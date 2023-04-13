@@ -57,12 +57,12 @@ public class ShopFragment extends BaseFragment {
     @ViewInject(R.id.bottomSheetLayout)
     private BottomSheetLayout bottomSheetLayout;
     private View bottomSheet;
-    @ViewInject(R.id.shop_goods_car_1)
+    /*@ViewInject(R.id.shop_goods_car_1)
     private View carInfo;
     @ViewInject(R.id.settlement)
     private TextView settlement;
     @ViewInject(R.id.goods_price)
-    private TextView goodsPrice;
+    private TextView goodsPrice;*/
     private List<ShoppingCart> shoppingCartsData;
     private ShoppingCartImpl shoppingCartDao;
     private String userId;
@@ -103,7 +103,7 @@ public class ShopFragment extends BaseFragment {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setUserId(userId);
         shoppingCart.setShopId(shopId);
-        goodsPrice.setText(getShopPrice(shoppingCart));
+        //goodsPrice.setText(getShopPrice(shoppingCart));
     }
 
     @Override
@@ -146,7 +146,7 @@ public class ShopFragment extends BaseFragment {
             adapter.notifyDataSetChanged();
             rAdapter.notifyDataSetChanged();
             bottomSheetLayout.dismissSheet();
-            goodsPrice.setText("0.0");
+            //goodsPrice.setText("0.0");
         });
         ListView carList = view.findViewById(R.id.car_list);
         adapter = new ShoppingCartAdapter(context, shoppingCartsData);
@@ -156,7 +156,7 @@ public class ShopFragment extends BaseFragment {
             public void onSelectAdd(int position, ShoppingCart shoppingCart) {
                 //shoppingCartDao.insertGoods(shoppingCart);
                 adapter.notifyDataSetChanged();
-                goodsPrice.setText(getShopPrice(shoppingCart));
+               // goodsPrice.setText(getShopPrice(shoppingCart));
             }
 
             @Override
@@ -169,7 +169,7 @@ public class ShopFragment extends BaseFragment {
                 }*/
                 adapter.notifyDataSetChanged();
                 rAdapter.notifyDataSetChanged();
-                goodsPrice.setText(getShopPrice(shoppingCart));
+               // goodsPrice.setText(getShopPrice(shoppingCart));
                 if (shoppingCartsData.size() == 0) {
                     bottomSheetLayout.dismissSheet();
                 }
@@ -234,7 +234,7 @@ public class ShopFragment extends BaseFragment {
                // shoppingCartDao.insertGoods(shoppingCart);
                 ((ImageView) holder.getView(R.id.addToCar)).setVisibility(View.VISIBLE);
                // ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
-                goodsPrice.setText(getShopPrice(shoppingCart));
+                //goodsPrice.setText(getShopPrice(shoppingCart));
                 rAdapter.notifyDataSetChanged();
             }
 
@@ -243,7 +243,7 @@ public class ShopFragment extends BaseFragment {
                 ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(), data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(),  data.get(position).getSubjectNumber());
                // shoppingCartDao.deleteGoods(shoppingCart);
                 //((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart) == null ? "" : shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
-                goodsPrice.setText(getShopPrice(shoppingCart));
+                //goodsPrice.setText(getShopPrice(shoppingCart));
                 rAdapter.notifyDataSetChanged();
 
             }

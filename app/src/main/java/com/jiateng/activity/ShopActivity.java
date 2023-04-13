@@ -90,7 +90,7 @@ public class ShopActivity extends FragmentActivity implements RadioGroup.OnCheck
                 changeFragment(new AppraiseFragment(), true);
                 break;
             case R.id.shop_title_business:
-                changeFragment(new BusinessFragment(), true);
+                changeFragment(new BusinessFragment(shopInfo), true);
                 break;
             default:
                 break;
