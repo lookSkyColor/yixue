@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jiateng.bean.StoreBean;
+import com.jiateng.bean.Subject;
 
 public abstract class ShopRecyclerViewAdater<T> extends RecyclerView.Adapter<ShopRecyclerHolder> {
 
@@ -134,9 +135,9 @@ public abstract class ShopRecyclerViewAdater<T> extends RecyclerView.Adapter<Sho
 
 
     public interface ShoppingItemClickListener {
-        void addClick(ShopRecyclerHolder holder, List<StoreBean.Goods> data, int position);
+        void addClick(ShopRecyclerHolder holder, List<Subject> data, int position);
 
-        void reduceClick(ShopRecyclerHolder holder, List<StoreBean.Goods> data, int position);
+        void reduceClick(ShopRecyclerHolder holder, List<Subject> data, int position);
     }
 
     private RecyclerView recyclerView;

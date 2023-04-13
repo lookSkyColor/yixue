@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class MockData {
     private static ArrayList<ShopInfo> shopInfoList;
     private static ArrayList<StoreBean.Goods> goodsList;
-    private static String userId = UUIDUtil.getUUID();
+    private static String userId ;
 
     private static String[] shopIds;
 
@@ -117,5 +117,25 @@ public class MockData {
 
     public static String getUserId() {
         return userId;
+    }
+
+    public static void setShopInfoList(ArrayList<ShopInfo> shopInfoList) {
+        MockData.shopInfoList = shopInfoList;
+    }
+
+    public static void setGoodsList(ArrayList<StoreBean.Goods> goodsList) {
+        MockData.goodsList = goodsList;
+    }
+
+    public static void setUserId(String userId) {
+        MockData.userId = userId;
+    }
+
+    public static String[] getShopIds() {
+        return shopIds;
+    }
+
+    public static void setShopIds(String[] shopIds) {
+        MockData.shopIds = shopIds;
     }
 }

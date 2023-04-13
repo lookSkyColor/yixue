@@ -24,9 +24,12 @@ import com.jiateng.activity.GoodsActivity;
 import com.jiateng.adapter.ShopRecyclerHolder;
 import com.jiateng.adapter.ShopRecyclerViewAdater;
 import com.jiateng.adapter.ShoppingCartAdapter;
+import com.jiateng.bean.Category;
+import com.jiateng.bean.School;
 import com.jiateng.bean.ShopInfo;
 import com.jiateng.bean.ShoppingCart;
 import com.jiateng.bean.StoreBean;
+import com.jiateng.bean.Subject;
 import com.jiateng.common.base.BaseFragment;
 import com.jiateng.common.utils.PicassoUtil;
 import com.jiateng.common.utils.SharedPreferencesUtil;
@@ -34,6 +37,8 @@ import com.jiateng.db.impl.ShoppingCartImpl;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,12 +65,12 @@ public class ShopFragment extends BaseFragment {
     private String shopId;
     private ShoppingCartAdapter adapter;
 
-    private List<StoreBean.Goods> goodsList;
+    private List<Subject> goodsList;
 
 
-    public ShopFragment(ShopInfo shopInfo) {
+    public ShopFragment(School shopInfo) {
         super();
-        this.shopId = shopInfo.getShopId();
+        this.shopId = shopInfo.getId()+"";
         this.userId = SharedPreferencesUtil.getString(context, "userId", null);
         this.goodsList = shopInfo.getGoodsList();
     }
@@ -170,7 +175,7 @@ public class ShopFragment extends BaseFragment {
         return view;
     }
 
-    private StoreBean storeBean;
+    private List<Category> categories;
     private LAdapter lAdapter;
     private RAdapter rAdapter;
 
@@ -178,9 +183,8 @@ public class ShopFragment extends BaseFragment {
      * TODO 从网络上请求数据
      */
     private void initGoodsData() {
-        storeBean = new StoreBean();
-        storeBean.categories = goodsList.stream().map(goods -> new StoreBean.Category(goods.getCategory())).distinct().collect(Collectors.toList());
-        storeBean.goodsList = goodsList;
+        categories = goodsList.stream().map(goods -> new Category(goods.getCategory())).distinct().collect(Collectors.toList());
+        goodsList = goodsList;
     }
 
 
@@ -195,13 +199,13 @@ public class ShopFragment extends BaseFragment {
      * 初始化RecyclerView以及各种组件
      */
     private void initGoodsView() {
-        tv_head.setText(storeBean.categories.get(0).getCategory());
+        tv_head.setText(categories.get(0).getCategory());
         rvL.setLayoutManager(new LinearLayoutManager(context));
         rvR.setLayoutManager(new LinearLayoutManager(context));
-        lAdapter = new LAdapter(context, R.layout.item_goods_left, storeBean.categories);
+        lAdapter = new LAdapter(context, R.layout.item_goods_left, goodsList);
         lAdapter.bindToRecyclerView(rvL);
         rvL.setAdapter(lAdapter);
-        rAdapter = new RAdapter(context, R.layout.item_goods_right, storeBean.goodsList);
+        rAdapter = new RAdapter(context, R.layout.item_goods_right, goodsList);
         rvR.setAdapter(rAdapter);
     }
 
@@ -217,10 +221,10 @@ public class ShopFragment extends BaseFragment {
         rAdapter.setShoppingItemClickListener(new ShopRecyclerViewAdater.ShoppingItemClickListener() {
 
             @Override
-            public void addClick(ShopRecyclerHolder holder, List<StoreBean.Goods> data, int position) {
+            public void addClick(ShopRecyclerHolder holder, List<Subject> data, int position) {
 //                String goods  Id = data.get(position).getCategory() + data.get(position).getName();
 //                double price = Double.parseDouble(((TextView) holder.getView(R.id.tvPrice)).getText().toString());
-                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getGoodsId(), data.get(position).getName(), data.get(position).getPrice(), data.get(position).getGoodsImgUrl(), 1);
+                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(),data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(), data.get(position).getSubjectNumber());
                 shoppingCartDao.insertGoods(shoppingCart);
                 ((ImageView) holder.getView(R.id.addToCar)).setVisibility(View.VISIBLE);
                 ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
@@ -229,8 +233,8 @@ public class ShopFragment extends BaseFragment {
             }
 
             @Override
-            public void reduceClick(ShopRecyclerHolder holder, List<StoreBean.Goods> data, int position) {
-                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getGoodsId(), data.get(position).getName(), data.get(position).getPrice(), data.get(position).getGoodsImgUrl(), 1);
+            public void reduceClick(ShopRecyclerHolder holder, List<Subject> data, int position) {
+                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(), data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(),  data.get(position).getSubjectNumber());
                 shoppingCartDao.deleteGoods(shoppingCart);
                 ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart) == null ? "" : shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
                 goodsPrice.setText(getShopPrice(shoppingCart));
@@ -287,7 +291,7 @@ public class ShopFragment extends BaseFragment {
         double money = 0.0;
         List<ShoppingCart> shoppingCarts = shoppingCartDao.queryByGoodsByUserIdShopId(shoppingCart.getUserId(), shoppingCart.getShopId());
         for (ShoppingCart cart : shoppingCarts) {
-            money = money + cart.getGoodsPrice().doubleValue() * cart.getGoodsCount().intValue();
+            money = money + cart.getGoodsPrice() * cart.getGoodsCount().intValue();
         }
         return String.format("%.1f", money);
     }
@@ -312,9 +316,9 @@ public class ShopFragment extends BaseFragment {
     }
 
 
-    class LAdapter extends ShopRecyclerViewAdater<StoreBean.Category> {
+    class LAdapter extends ShopRecyclerViewAdater<Subject> {
 
-        public LAdapter(Context context, int resLayout, List<StoreBean.Category> data) {
+        public LAdapter(Context context, int resLayout, List<Subject> data) {
             super(context, resLayout, data);
         }
 
@@ -366,25 +370,25 @@ public class ShopFragment extends BaseFragment {
         }
     }
 
-    class RAdapter extends ShopRecyclerViewAdater<StoreBean.Goods> {
+    class RAdapter extends ShopRecyclerViewAdater<Subject> {
         String goodsId;
 
-        public RAdapter(Context context, int resLayout, List<StoreBean.Goods> data) {
+        public RAdapter(Context context, int resLayout, List<Subject> data) {
             super(context, resLayout, data);
         }
 
         @Override
         public void convert(ShopRecyclerHolder holder, final int position) {
-            ((TextView) holder.getView(R.id.tvName)).setText(getmData().get(position).getName());
-            ((TextView) holder.getView(R.id.tvPrice)).setText(String.format("%.1f", getmData().get(position).getPrice()));
-            ((TextView) holder.getView(R.id.shop_goods_count)).setText(getmData().get(position).getCount() + "");
-            PicassoUtil.setImage(getmData().get(position).getGoodsImgUrl(), (AppCompatImageView) holder.getView(R.id.tv_image));
+            ((TextView) holder.getView(R.id.tvName)).setText(getmData().get(position).getSubjectName());
+            ((TextView) holder.getView(R.id.tvPrice)).setText(String.format("%.1f", getmData().get(position).getSubjectPrice()));
+            ((TextView) holder.getView(R.id.shop_goods_count)).setText(getmData().get(position).getSubjectNumber() + "");
+            PicassoUtil.setImage(getmData().get(position).getSubjectImgUrl(), (AppCompatImageView) holder.getView(R.id.tv_image));
 
             ImageView add = holder.getView(R.id.addToCar);
             TextView addCount = holder.getView(R.id.carCount);
             ImageView reduce = holder.getView(R.id.reduceFromCar);
-            goodsId = getmData().get(position).getCategory() + getmData().get(position).getName();
-            ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, getmData().get(position).getGoodsId(), getmData().get(position).getName(), getmData().get(position).getPrice(), getmData().get(position).getGoodsImgUrl(), 1);
+            goodsId = getmData().get(position).getCategory() + getmData().get(position).getSubjectName();
+            ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, getmData().get(position).getId()+"", getmData().get(position).getSubjectName(), getmData().get(position).getSubjectPrice(), getmData().get(position).getSubjectImgUrl(), 1);
             ShoppingCart goods = shoppingCartDao.queryOne(shoppingCart);
             if (goods == null) {
                 reduce.setVisibility(View.GONE);
@@ -422,7 +426,7 @@ public class ShopFragment extends BaseFragment {
                 Intent intent = new Intent(context, GoodsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("shoppingCartInfo", shoppingCart);
-                bundle.putSerializable("goods", getmData().get(position));
+                bundle.putSerializable("goods", (Serializable) getmData().get(position));
                 intent.putExtras(bundle);
                 startActivity(intent);
             });

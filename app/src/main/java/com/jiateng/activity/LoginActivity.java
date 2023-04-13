@@ -1,25 +1,61 @@
 package com.jiateng.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.alibaba.fastjson.JSON;
+
+
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
+import com.jiateng.bean.JsonBean;
+import com.jiateng.bean.UserInfo;
+import com.jiateng.common.utils.MockData;
+import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.jiateng.common.widget.AppTitleView;
+import com.jiateng.fragment.UserFragment;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.db.annotation.NotNull;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
+
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.hutool.aop.interceptor.SpringCglibInterceptor;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,6 +79,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private Button timeButton;
 
+    private EditText edit_input;
+    private Button btn_send;
+    private String inputContent;
+
+    private FragmentManager manager;
+    private FragmentTransaction transaction;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +107,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (!judgePhoneNums(inputPhoneEt.getText().toString())) {
                     return;
                 }
+
+                //提交键值对需要用到FormBody,FormBody继承自RequestBody
+                FormBody formBody = new FormBody.Builder()
+                        //添加键值对(通多Key-value的形式添加键值对参数)
+                        .add("iphone", inputPhoneEt.getText().toString())
+                        .build();
+                final Request request = new Request.Builder()
+                        .post(formBody)
+                        .url("http://192.168.0.128:8080/message/getMessageCode")
+                        .build();
+
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure( Call call,  IOException e) {
+                        Log.e("TAG", "Post请求(键值对)异步响应failure==" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onResponse( Call call, Response response) throws IOException {
+                        String result = response.body().string();
+                        Log.e("TAG", "Post请求(键值对)异步响应Success==" + result);
+                    }
+                });
                 myCountDownTimer.start();
             }
         });
@@ -85,29 +156,68 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         String phoneNums = inputPhoneEt.getText().toString();
-        switch (v.getId()) {
-            case R.id.login_request_code_btn:
-// 1. 通过规则判断手机号
-                if (!judgePhoneNums(phoneNums)) {
-                    return;
-                }
-                // 2. 通过sdk发送短信验证
-                //SMSSDK.getVerificationCode("86", phoneNums);
-
-
-                break;
-
-            case R.id.login_commit_btn:
-//将收到的验证码和手机号提交再次核对
-//                SMSSDK.submitVerificationCode("86", phoneNums, inputCodeEt
-//                        .getText().toString());
-//                createProgressBar();
-                if (!judgePhoneNums(phoneNums)) {
-                    return;
-                }
-                break;
-
+        String code = inputCodeEt.getText().toString();
+        if (!judgePhoneNums(phoneNums)) {
+            return;
         }
+        if (!judgeCode(code)) {
+            return;
+        }
+
+        RequestBody requestBody = RequestBody.create("{"+"\"iphone\":"+phoneNums+","+"\"code\":"+code+"}", MediaType.parse("application/json; charset=utf-8"));
+        final Request request = new Request.Builder()
+                .post(requestBody)
+                .url("http://192.168.0.128:8080/login/login")
+                .build();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient.Builder()
+                            .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
+                            .build();
+                    Response response = client.newCall(request).execute();
+                      if (response.isSuccessful()) {
+                          String s = response.body().string();
+                          Log.e("TAG", "Post请求String同步响应success==" + s);
+
+                        Gson gson = new Gson();
+                        JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<UserInfo>>() {}.getType());
+
+
+                        if (0 != jsonBean.getCode()){
+                            Toast.makeText(LoginActivity.this, jsonBean.getMsg(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                          UserInfo userInfo = (UserInfo) jsonBean.getResult();
+                          SharedPreferencesUtil.putLong(LoginActivity.this,"userId",userInfo.getId());
+                          if (0 != userInfo.getCorporationId()){
+                              SharedPreferencesUtil.putInt(LoginActivity.this,"corporationId",userInfo.getCorporationId());
+                          }
+                          if (0 != userInfo.getRoleId()){
+                              SharedPreferencesUtil.putInt(LoginActivity.this,"roleId",userInfo.getRoleId());
+                          }
+
+                          Intent intent = new Intent();
+                          //setClass函数的第一个参数是一个Context对象
+                          //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象
+                          //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
+                          intent.setClass(LoginActivity.this, MainActivity.class);
+                          startActivity(intent);
+
+                      } else {
+                        Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("TAG", "Post请求String同步响应failure==" + e.getMessage());
+                }
+            }
+        }).start();
+
+
     }
 
     private boolean judgePhoneNums(String phoneNums) {
@@ -116,6 +226,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return true;
         }
         Toast.makeText(this, "手机号码输入有误！", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+
+    private  boolean judgeCode(String code){
+        if (isMatchLength(code, 4)) {
+            return true;
+        }
+        Toast.makeText(this, "验证码输入有误！", Toast.LENGTH_SHORT).show();
         return false;
     }
 
@@ -165,6 +284,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             timeButton.setClickable(true);
         }
     }
+
+
+
 
 }
 

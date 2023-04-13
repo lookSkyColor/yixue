@@ -15,6 +15,7 @@ import com.jiateng.R;
 import com.jiateng.adapter.ShoppingCartAdapter;
 import com.jiateng.bean.ShoppingCart;
 import com.jiateng.bean.StoreBean;
+import com.jiateng.bean.Subject;
 import com.jiateng.common.utils.PicassoUtil;
 import com.jiateng.common.widget.AppTitleView;
 import com.jiateng.db.impl.ShoppingCartImpl;
@@ -49,7 +50,7 @@ public class GoodsActivity extends Activity {
     private String userId;
     private String goodsId;
     private String shopId;
-    private String price;
+    private int price;
     private ShoppingCartAdapter adapter;
     private String goodsName;
     private String goodsImgUrl;
@@ -62,19 +63,19 @@ public class GoodsActivity extends Activity {
 
         Bundle bundle = getIntent().getExtras();
         ShoppingCart goodsInfo = (ShoppingCart) bundle.getSerializable("shoppingCartInfo");
-        StoreBean.Goods goods = (StoreBean.Goods) bundle.getSerializable("goods");
+        Subject goods = (Subject) bundle.getSerializable("goods");
         userId = goodsInfo.getUserId();
         shopId = goodsInfo.getShopId();
         goodsId = goodsInfo.getGoodsId();
-        price = goodsInfo.getGoodsPrice().toString();
+        price = goodsInfo.getGoodsPrice();
         goodsName = goodsInfo.getGoodsName();
         goodsImgUrl = goodsInfo.getGoodsImgUrl();
         shoppingCartDao = ShoppingCartImpl.getInstance(GoodsActivity.this);
         initCarData();
         shoppingCartPrice.setText(getShopPrice(goodsInfo));
-        currentGoodsName.setText(goods.getName());
-        currentGoodsPrice.setText(goods.getPrice().toString());
-        PicassoUtil.setImage(goods.getGoodsImgUrl(), currentGoodsImg);
+        currentGoodsName.setText(goods.getSubjectName());
+        currentGoodsPrice.setText(goods.getSubjectPrice());
+        PicassoUtil.setImage(goods.getSubjectImgUrl(), currentGoodsImg);
         adapter = new ShoppingCartAdapter(GoodsActivity.this, shoppingCartsData);
 
         titleView.onClickTitleListener(v -> {
@@ -85,7 +86,7 @@ public class GoodsActivity extends Activity {
         });
         addGoodsButton.setOnClickListener(v -> {
             initCarData();
-            ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, goodsId, goodsName, Double.parseDouble(price), goodsImgUrl, 1);
+            ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, goodsId, goodsName, price, goodsImgUrl, 1);
             shoppingCartDao.insertGoods(shoppingCart);
             shoppingCartPrice.setText(getShopPrice(shoppingCart));
         });
@@ -161,7 +162,7 @@ public class GoodsActivity extends Activity {
         double money = 0.0;
         List<ShoppingCart> shoppingCarts = shoppingCartDao.queryByGoodsByUserIdShopId(shoppingCart.getUserId(), shoppingCart.getShopId());
         for (ShoppingCart cart : shoppingCarts) {
-            money = money + cart.getGoodsPrice().doubleValue() * cart.getGoodsCount().intValue();
+            money = money + cart.getGoodsPrice() * cart.getGoodsCount().intValue();
         }
         return String.format("%.1f", money);
     }

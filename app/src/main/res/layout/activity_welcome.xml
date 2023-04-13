@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/welcome" />
+        android:src="@drawable/welcome2" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="校园订餐平台"
+        android:text="让学习变得非常容易"
         android:textColor="@color/black"
         android:textSize="40sp" />
 

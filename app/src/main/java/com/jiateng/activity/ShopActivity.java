@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.jiateng.R;
+import com.jiateng.bean.School;
 import com.jiateng.bean.ShopInfo;
 import com.jiateng.fragment.AppraiseFragment;
 import com.jiateng.fragment.BusinessFragment;
@@ -42,7 +43,7 @@ public class ShopActivity extends FragmentActivity implements RadioGroup.OnCheck
     private boolean isCollect = false;
     private String shopId;
 
-    private ShopInfo shopInfo;
+    private School shopInfo;
 
 
     @Override
@@ -51,11 +52,11 @@ public class ShopActivity extends FragmentActivity implements RadioGroup.OnCheck
         setContentView(R.layout.activity_shop);
         ViewUtils.inject(this);
         Bundle bundle = getIntent().getExtras();
-        shopInfo = (ShopInfo) bundle.getSerializable("shopInfo");
+        shopInfo = (School) bundle.getSerializable("shopInfo");
 
-        shopId = shopInfo.getShopId();
-        String shopName = shopInfo.getShopName();
-        String shopImgUrl = shopInfo.getShopImgUrl();
+        shopId = shopInfo.getId()+"";
+        String shopName = shopInfo.getSchoolName();
+        String shopImgUrl = shopInfo.getSchoolImage();
         Picasso.get().load(shopImgUrl).into(image);
         tv_shopName.setText(shopName);
 

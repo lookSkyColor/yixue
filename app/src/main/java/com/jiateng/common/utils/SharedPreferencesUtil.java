@@ -103,6 +103,38 @@ public class SharedPreferencesUtil {
     }
 
     /**
+     * 写入int变量至sharedPreferences中
+     *
+     * @param context 上下文环境
+     * @param key     存储节点名称
+     * @param value   存储节点的值String
+     */
+    public static void putLong(Context context, String key, long value) {
+        //存储节点文件的名称，读写方式
+        if (sharedPreferences == null) {
+            sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE);
+        }
+        sharedPreferences.edit().putLong(key, value).commit();
+    }
+
+
+    /**
+     * 读取int标识从sharedPreferences中
+     *
+     * @param context  上下文环境
+     * @param key      存储节点名称
+     * @param defValue 没有此节点的默认值
+     * @return 返回默认值或者此节点读取到的结果
+     */
+    public static long getLong(Context context, String key, long defValue) {
+        //存储节点文件的名称，读写方式
+        if (sharedPreferences == null) {
+            sharedPreferences = context.getSharedPreferences("config", Context.MODE_PRIVATE);
+        }
+        return sharedPreferences.getLong(key, defValue);
+    }
+
+    /**
      * 从sharedPreferences中移除指定节点
      *
      * @param context 上下文环境

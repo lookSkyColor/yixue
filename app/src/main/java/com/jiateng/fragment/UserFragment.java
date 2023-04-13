@@ -1,17 +1,31 @@
 package com.jiateng.fragment;
 
 
+import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
+
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.jiateng.R;
 import com.jiateng.activity.AddressActivity;
 import com.jiateng.activity.FeedbackActivity;
 import com.jiateng.activity.LoginActivity;
+import com.jiateng.activity.MainActivity;
 import com.jiateng.activity.MoreActivity;
 import com.jiateng.activity.SettingActivity;
 import com.jiateng.activity.StarActivity;
 import com.jiateng.common.base.BaseFragment;
+import com.jiateng.common.utils.MockData;
 import com.jiateng.common.widget.UserItemView;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -35,13 +49,19 @@ public class UserFragment extends BaseFragment {
     private UserItemView report;
     @ViewInject(R.id.user_item_setting)
     private UserItemView setting;
-
+    private TextView tvContent;
     @Override
     protected View initView() {
         View view = View.inflate(context, R.layout.fragment_user, null);
         ViewUtils.inject(this, view);
+        if(null != MockData.getUserId()){
+            TextView stateTextView = (TextView) view.findViewById(R.id.lblTitle);
+            stateTextView.setText(MockData.getUserId());
+        }
         return view;
     }
+
+
 
     @OnClick({R.id.user_item_setting,
             R.id.user_item_address,
@@ -67,9 +87,15 @@ public class UserFragment extends BaseFragment {
                 startActivity(new Intent(context, FeedbackActivity.class));
                 break;
             case R.id.user_item_login:
+                Log.d(TAG, "currentFragmentName-------->>  " + getClass().getSimpleName());
+
                 startActivity(new Intent(context, LoginActivity.class));
             default:
                 break;
         }
     }
+
+
+
+
 }

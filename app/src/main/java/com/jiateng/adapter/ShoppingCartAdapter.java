@@ -62,7 +62,7 @@ public class ShoppingCartAdapter extends BaseAdapter {
         goodsName.setText(shoppingCartData.get(position).getGoodsName());
         shoppingCartCount.setText(shoppingCartData.get(position).getGoodsCount() + "");
         double moneyCount = 0.0;
-        moneyCount += shoppingCartData.get(position).getGoodsPrice().doubleValue() * shoppingCartData.get(position).getGoodsCount().intValue();
+        moneyCount += shoppingCartData.get(position).getGoodsPrice() * shoppingCartData.get(position).getGoodsCount().intValue();
         shoppingCartPrice.setText(moneyCount + "");
         reduceButton.setOnClickListener(v -> onSelectListener.onSelectReduce(position));
         addButton.setOnClickListener(v -> onSelectListener.onSelectAdd(position, shoppingCartData.get(position)));

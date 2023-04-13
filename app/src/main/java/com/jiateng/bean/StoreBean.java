@@ -41,11 +41,11 @@ public class StoreBean implements Serializable {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Goods implements Serializable {
-        private String goodsId;
-        private String goodsImgUrl;
-        private String name;
+        private String id;
+        private String subjectImgUrl;
+        private String subjectName;
         private String category;
-        private Double price;
-        private Integer count;
+        private Double subjectPrice;
+        private Integer subjectNumber;
     }
 }

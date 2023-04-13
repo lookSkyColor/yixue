@@ -1,8 +1,10 @@
 package com.jiateng.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -38,8 +40,6 @@ public class MainActivity extends FragmentActivity implements RadioGroup.OnCheck
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ViewUtils.inject(this);
-
-        SharedPreferencesUtil.putString(MainActivity.this, "userId", MockData.getUserId());
 
         fragmentManager = getSupportFragmentManager();
 
@@ -81,8 +81,12 @@ public class MainActivity extends FragmentActivity implements RadioGroup.OnCheck
             //如果不是第一次识别，将加入回退栈null，消除重影问题
             transaction.addToBackStack(null);
         }
+
         //3、提交事务
         transaction.commit();
     }
+
+
+
 
 }

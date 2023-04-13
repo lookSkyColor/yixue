@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.jiateng.activity.SettingActivity">
+    tools:context="com.jiateng.activity.SettingActivity" android:id="@+id/contentLayout">
 
     <com.jiateng.common.widget.AppTitleView
         android:id="@+id/login_title"
@@ -34,7 +34,7 @@
         android:layout_below="@+id/login_input_phone_et"
         android:layout_marginTop="44dp"
         android:hint="请输入验证码"
-        android:inputType="textPassword" >
+        android:numeric="integer" >
     </EditText>
 
     <Button
@@ -52,5 +52,5 @@
         android:layout_alignLeft="@+id/login_input_code_et"
         android:layout_below="@+id/login_input_code_et"
         android:layout_marginTop="44dp"
-        android:text="注册" />
+        android:text="登录" />
 </LinearLayout>
