@@ -128,7 +128,7 @@
                     android:src="@drawable/ic_sub"
                     android:visibility="gone" />
 
-                <TextView
+               <!-- <TextView
                     android:id="@+id/carCount"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -143,7 +143,7 @@
                     android:layout_marginRight="@dimen/normal_space"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_add" />
+                    android:src="@drawable/ic_add" />-->
             </LinearLayout>
 
 

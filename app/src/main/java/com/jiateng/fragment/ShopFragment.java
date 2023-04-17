@@ -190,7 +190,7 @@ public class ShopFragment extends BaseFragment {
 
         categories = goodsList.stream().map(goods -> new Category(goods.getCategory())).distinct().collect(Collectors.toList());
 
-        goodsList = goodsList;
+         goodsList = goodsList;
     }
 
 
@@ -230,9 +230,9 @@ public class ShopFragment extends BaseFragment {
             public void addClick(ShopRecyclerHolder holder, List<Subject> data, int position) {
 //                String goods  Id = data.get(position).getCategory() + data.get(position).getName();
 //                double price = Double.parseDouble(((TextView) holder.getView(R.id.tvPrice)).getText().toString());
-                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(),data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(), data.get(position).getSubjectNumber());
+               // ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(),data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(), data.get(position).getSubjectNumber());
                // shoppingCartDao.insertGoods(shoppingCart);
-                ((ImageView) holder.getView(R.id.addToCar)).setVisibility(View.VISIBLE);
+                //((ImageView) holder.getView(R.id.addToCar)).setVisibility(View.VISIBLE);
                // ((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
                 //goodsPrice.setText(getShopPrice(shoppingCart));
                 rAdapter.notifyDataSetChanged();
@@ -240,7 +240,7 @@ public class ShopFragment extends BaseFragment {
 
             @Override
             public void reduceClick(ShopRecyclerHolder holder, List<Subject> data, int position) {
-                ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(), data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(),  data.get(position).getSubjectNumber());
+                //ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, data.get(position).getId()+"", data.get(position).getSubjectName(), data.get(position).getSubjectPrice(), data.get(position).getSubjectImgUrl(),  data.get(position).getSubjectNumber());
                // shoppingCartDao.deleteGoods(shoppingCart);
                 //((TextView) holder.getView(R.id.carCount)).setText(shoppingCartDao.queryOne(shoppingCart) == null ? "" : shoppingCartDao.queryOne(shoppingCart).getGoodsCount() + "");
                 //goodsPrice.setText(getShopPrice(shoppingCart));
@@ -392,8 +392,8 @@ public class ShopFragment extends BaseFragment {
             ((TextView) holder.getView(R.id.shop_goods_count)).setText(getmData().get(position).getSubjectNumber() + "");
             PicassoUtil.setImage(getmData().get(position).getSubjectImgUrl(), (AppCompatImageView) holder.getView(R.id.tv_image));
 
-            ImageView add = holder.getView(R.id.addToCar);
-            TextView addCount = holder.getView(R.id.carCount);
+           // ImageView add = holder.getView(R.id.addToCar);
+            //TextView addCount = holder.getView(R.id.carCount);
             ImageView reduce = holder.getView(R.id.reduceFromCar);
             goodsId = getmData().get(position).getCategory() + getmData().get(position).getSubjectName();
             ShoppingCart shoppingCart = new ShoppingCart(null, userId, shopId, getmData().get(position).getId()+"", getmData().get(position).getSubjectName(), getmData().get(position).getSubjectPrice(), getmData().get(position).getSubjectImgUrl(), 1);
@@ -406,11 +406,11 @@ public class ShopFragment extends BaseFragment {
                 addCount.setText(goods.getGoodsCount() + "");
                 goodsPrice.setText(getShopPrice(shoppingCart));
             }*/
-            add.setOnClickListener(v -> {
+            /*add.setOnClickListener(v -> {
                 if (shoppingItemClickListener != null) {
                     shoppingItemClickListener.addClick(holder, getmData(), position);
                 }
-            });
+            });*/
             reduce.setOnClickListener(v -> {
                 if (shoppingItemClickListener != null) {
                     shoppingItemClickListener.reduceClick(holder, getmData(), position);

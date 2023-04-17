@@ -5,34 +5,35 @@
     android:background="@color/background"
     android:orientation="vertical">
 
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingLeft="@dimen/normal_space"
         android:paddingTop="@dimen/normal_space"
-        android:paddingRight="@dimen/normal_space">
+        android:paddingRight="@dimen/normal_space">-->
 
-        <RelativeLayout
+       <!-- <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!--位置-->
-            <TextView
+            &lt;!&ndash;位置&ndash;&gt;
+            &lt;!&ndash;<TextView
+                android:id="@+id/school_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:text="西安石油大学鄠邑校区"
-                android:textSize="@dimen/text_phone_title_size" />
-            <!--消息-->
+                android:textSize="@dimen/text_phone_title_size" />&ndash;&gt;
+            &lt;!&ndash;消息&ndash;&gt;
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_comments_1" />
-        </RelativeLayout>
+        </RelativeLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,9 +54,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
-    </LinearLayout>
+
 
 </LinearLayout>

@@ -14,4 +14,24 @@
         TitleView:title="我的地址"
         TitleView:visible="true" />
 
+
+    <TextView
+        android:id="@+id/order_item_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/order_item_orderInfo"
+        android:layout_marginTop="@dimen/little_space"
+        android:text="地址："
+        android:textSize="@dimen/text_phone_context_size" />
+
+    <TextView
+        android:id="@+id/order_item_total_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/little_space"
+        android:text="¥"
+        android:textColor="@color/ic_launcher_background"
+        android:textSize="@dimen/text_phone_context_size" />
+
+
 </LinearLayout>

@@ -155,13 +155,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                           UserInfo userInfo = (UserInfo) jsonBean.getResult();
                           SharedPreferencesUtil.putLong(LoginActivity.this,"userId",userInfo.getId());
+                          SharedPreferencesUtil.putString(LoginActivity.this,"iphone",replaceMiddle(phoneNums));
                           if (0 != userInfo.getCorporationId()){
                               SharedPreferencesUtil.putInt(LoginActivity.this,"corporationId",userInfo.getCorporationId());
                           }
                           if (0 != userInfo.getRoleId()){
                               SharedPreferencesUtil.putInt(LoginActivity.this,"roleId",userInfo.getRoleId());
                           }
-
+                          SharedPreferencesUtil.putString(LoginActivity.this,"token",userInfo.getToken());
                           Intent intent = new Intent();
                           //setClass函数的第一个参数是一个Context对象
                           //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象
@@ -189,6 +190,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return false;
     }
 
+
+    public static String replaceMiddle(String input) {
+        return input.substring(0, 3) + "****" + input.substring(7);
+    }
 
     private  boolean judgeCode(String code){
         if (isMatchLength(code, 4)) {

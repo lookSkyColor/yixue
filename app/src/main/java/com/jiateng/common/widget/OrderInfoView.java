@@ -44,7 +44,8 @@ public class OrderInfoView extends LinearLayout {
         attributes.recycle();
     }
 
-    public void setOrderInfo(int count, String msg) {
+    public void setOrderInfo(String front ,int count, String msg) {
+        tv_front.setText(front);
         tv_mid.setText("×" + count);
         tv_back.setText(msg);
     }

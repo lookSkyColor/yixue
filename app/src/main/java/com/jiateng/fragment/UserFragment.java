@@ -26,6 +26,7 @@ import com.jiateng.activity.SettingActivity;
 import com.jiateng.activity.StarActivity;
 import com.jiateng.common.base.BaseFragment;
 import com.jiateng.common.utils.MockData;
+import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.jiateng.common.widget.UserItemView;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -54,9 +55,10 @@ public class UserFragment extends BaseFragment {
     protected View initView() {
         View view = View.inflate(context, R.layout.fragment_user, null);
         ViewUtils.inject(this, view);
-        if(null != MockData.getUserId()){
+        long userId = SharedPreferencesUtil.getLong(context, "userId", 0L);
+        if(0 != userId){
             TextView stateTextView = (TextView) view.findViewById(R.id.lblTitle);
-            stateTextView.setText(MockData.getUserId());
+            stateTextView.setText(SharedPreferencesUtil.getString(context,"iphone",""));
         }
         return view;
     }
@@ -86,10 +88,10 @@ public class UserFragment extends BaseFragment {
             case R.id.user_item_feedback:
                 startActivity(new Intent(context, FeedbackActivity.class));
                 break;
-            case R.id.user_item_login:
+           /* case R.id.user_item_login:
                 Log.d(TAG, "currentFragmentName-------->>  " + getClass().getSimpleName());
 
-                startActivity(new Intent(context, LoginActivity.class));
+                startActivity(new Intent(context, LoginActivity.class));*/
             default:
                 break;
         }

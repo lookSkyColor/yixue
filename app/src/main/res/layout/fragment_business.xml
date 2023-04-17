@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_marginTop="@dimen/normal_space"
         android:layout_width="match_parent"
-        android:layout_height="108dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/normal_space"
         android:layout_marginRight="@dimen/normal_space"
         android:background="@color/front_color">
@@ -50,7 +50,7 @@
             android:layout_below="@id/shop_business_time_label"
             android:layout_marginLeft="@dimen/normal_space"
             android:layout_marginTop="@dimen/normal_space"
-            android:text="位置"
+            android:text="位置:"
             android:textSize="@dimen/text_phone_context_size" />
 
         <TextView

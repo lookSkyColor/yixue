@@ -1,27 +1,49 @@
 package com.jiateng.fragment;
 
 
-import static com.jiateng.common.config.Constants.ORDRE_STATUS_CANCEL;
-import static com.jiateng.common.config.Constants.ORDRE_STATUS_FINISH;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
+import com.jiateng.activity.GoodsActivity;
+import com.jiateng.activity.LoginActivity;
 import com.jiateng.activity.OrderInfoActivity;
 import com.jiateng.activity.ShopActivity;
+import com.jiateng.adapter.HomeFragmentAdapter;
 import com.jiateng.adapter.OrderAdapter;
+import com.jiateng.bean.JsonBean;
 import com.jiateng.bean.Order;
+import com.jiateng.bean.OrderListType;
+import com.jiateng.bean.School;
+import com.jiateng.common.Constant;
 import com.jiateng.common.base.BaseFragment;
 import com.jiateng.common.utils.RetrofitUtils;
+import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @Description:
@@ -33,47 +55,105 @@ import java.util.Date;
 public class OrderFragment extends BaseFragment implements OrderAdapter.OrderItemClickCallBack {
     @ViewInject(R.id.list_item_order_history)
     private ListView orderListView;
-    private ArrayList<Order> orders;
+    private ArrayList<OrderListType> orders;
     private RetrofitUtils retrofitUtils;
+    private OrderAdapter adapter;
 
     @Override
     protected View initView() {
         View view = View.inflate(context, R.layout.fragment_order, null);
         ViewUtils.inject(this, view);
         retrofitUtils = RetrofitUtils.getInstance();
+
         return view;
     }
 
     @Override
     protected void initData() {
         super.initData();
-        orders = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            Order order = new Order();
-            order.setShopName("户县软面" + (i + 1) + "店");
-            order.setMoney(10.0);
-            order.setStatus(i % 2 == 0 ? ORDRE_STATUS_FINISH : ORDRE_STATUS_CANCEL);
-            order.setFinishTimeOfOrder(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            orders.add(order);
-        }
-        orderListView.setAdapter(new OrderAdapter(orders, this));
-        orderListView.setFriction(ViewConfiguration.getScrollFriction() * 3);
+
+        long userId = SharedPreferencesUtil.getLong(context, "userId", 0L);
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add("userId", String.valueOf(userId));
+        FormBody formBody = builder.build();
+        final Request request = new Request.Builder()
+                .post(formBody).header("token", SharedPreferencesUtil.getString(context,"token",""))
+                .url(Constant.QUERY_ORDER_LIST_URL)
+                .build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true) //开启连接失败时重连逻辑
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.e("TAG", "onFailure" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String s = response.body().string();
+                    Log.e("TAG", "Post请求String同步响应success==" + s);
+
+                    Gson gson = new Gson();
+                    JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<List<OrderListType>>>() {
+                    }.getType());
+                    if (0 != jsonBean.getCode()){
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        startActivity(intent);
+                        return;
+                    }
+                     orders = (ArrayList<OrderListType>) jsonBean.getResult();
+                    new Thread(() -> {
+                             //do something takes long time in the work-thread
+                            runOnUiThread(() -> {
+                                orderListView.setAdapter(new OrderAdapter(orders, OrderFragment.this));
+                                orderListView.setFriction(ViewConfiguration.getScrollFriction() * 3);
+                                });
+                    }).start();
+
+                    //orderListView.post(() -> adapter.notifyDataSetChanged());
+                } else {
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    startActivity(intent);
+                    Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
+                }
+            }
+        });
+
+
 //        setListener();
     }
 
 
-    @Override
+   /* @Override
     public void clickShopName(View view) {
         int index = (int) view.getTag();
-        Order order = orders.get(index);
+        OrderListType order = orders.get(index);
         startActivity(new Intent(context, ShopActivity.class));
-    }
+    }*/
 
     @Override
     public void clickOrderInfo(View view) {
         int index = (int) view.getTag();
-        Order order = orders.get(index);
+        OrderListType order = orders.get(index);
         //TODO 设置Intent传递商店信息到下一个页面
-        startActivity(new Intent(context, OrderInfoActivity.class));
+        Intent intent = new Intent(context, OrderInfoActivity.class);
+        intent.putExtra("orderListType", order);
+        startActivity(intent);
     }
+
+
+
+    public final void runOnUiThread(Runnable action) {
+            if (Thread.currentThread() != mUiThread) {
+                mHandler.post(action);
+                 } else {
+                     action.run();
+                 }
+         }
+
+    final Handler mHandler = new Handler();
+    private Thread mUiThread;
+
 }

@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.jiateng.R;
 import com.jiateng.bean.School;
 import com.jiateng.bean.ShopInfo;
+import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.jiateng.fragment.AppraiseFragment;
 import com.jiateng.fragment.BusinessFragment;
 import com.jiateng.fragment.ShopFragment;
@@ -56,6 +57,7 @@ public class ShopActivity extends FragmentActivity implements RadioGroup.OnCheck
 
         shopId = shopInfo.getId()+"";
         String shopName = shopInfo.getSchoolName();
+        SharedPreferencesUtil.putString(this,"schoolName",shopName);
         String shopImgUrl = shopInfo.getSchoolImage();
         Picasso.get().load(shopImgUrl).into(image);
         tv_shopName.setText(shopName);

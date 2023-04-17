@@ -153,10 +153,9 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
             monthlySales.setTag(position);
             monthlySales.setText(shopInfo.getSchoolContent());
             shopSpace.setTag(position);
-            shopSpace.setText(shopInfo.getSchoolSubject());
+            shopSpace.setText(shopInfo.getSchoolAddress());
             shopOpenTime.setTag(position);
-            shopOpenTime.setText(shopInfo.getSchoolAddress());
-
+            shopOpenTime.setText(shopInfo.getSchoolBusinessHours());
             view.setOnClickListener(v -> {
                 if (myOnClickListener != null) {
                     myOnClickListener.viewClick(view, position);
@@ -182,7 +181,10 @@ public class HomeFragmentAdapter extends RecyclerView.Adapter {
             banner.setAdapter(new BannerImageAdapter<String>(data) {
                 @Override
                 public void onBindView(BannerImageHolder holder, String data, int position, int size) {
-                    Glide.with(context).load(data).into(holder.imageView);
+                    //Glide.with(context).load(data).into(holder.imageView);
+                    Picasso.get().load(data.trim()).into(holder.imageView);
+                    Picasso.get().setLoggingEnabled(true);
+
                 }
             });
         }

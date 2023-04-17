@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.jiateng.activity.GoodsActivity">
+    tools:context="com.jiateng.activity.OrderPayActivity">
 
     <com.jiateng.common.widget.AppTitleView
-        android:id="@+id/shop_goods_title"
+        android:id="@+id/order_pay_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        AppTitleView:title="商品详情"
+        AppTitleView:title="支付页面"
         AppTitleView:visible="true" />
 
     <com.flipboard.bottomsheet.BottomSheetLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,13 +24,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
+<!--
             <ImageView
                 android:id="@+id/goods_img"
                 android:layout_width="match_parent"
                 android:layout_height="324dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/test_goods" />
+                android:src="@drawable/test_goods" />-->
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -39,14 +39,14 @@
                 android:layout_marginTop="@dimen/normal_space"
                 android:layout_marginRight="@dimen/normal_space">
 
-                <TextView
+             <!--   <TextView
                     android:id="@+id/goods_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="外婆菜盖饭"
                     android:textColor="@color/phone_text_black"
-                    android:textSize="@dimen/text_phone_title_size" />
-                <TextView
+                    android:textSize="@dimen/text_phone_title_size" />-->
+               <!-- <TextView
                     android:id="@+id/goods_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -62,15 +62,15 @@
                     android:layout_marginBottom="@dimen/normal_space"
                     android:text="原价： "
                     android:textColor="@color/phone_text_red"
-                    android:textSize="@dimen/text_phone_title_size" />
+                    android:textSize="@dimen/text_phone_title_size" />-->
                 <TextView
                     android:id="@+id/discount_amount_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="40dp"
-                    android:layout_marginLeft="0dp"
-                    android:text="优惠金额："
+                    android:layout_marginLeft="100dp"
+                    android:text="支付成功"
                     android:textColor="@color/phone_text_red"
                     android:textSize="@dimen/text_phone_title_size" />
 
@@ -84,7 +84,7 @@
                     android:layout_toRightOf="@id/discount_amount_label"
                     android:textColor="@color/phone_text_red"
                     android:textSize="@dimen/text_phone_title_size" />-->
-                <EditText
+               <!-- <EditText
                     android:id="@+id/discount_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -92,7 +92,6 @@
                     android:layout_marginBottom="30dp"
                     android:digits="0123456789"
                     android:hint="请输入优惠价格"
-                    android:text="0"
                     android:layout_toRightOf="@id/discount_amount_label"
                     android:textColor="@color/phone_text_red"
                     android:inputType="number"
@@ -117,7 +116,8 @@
                     android:text="课时： "
                     android:layout_toLeftOf="@id/shop_goods_hours"
                     android:textColor="@color/phone_text_red"
-                    android:textSize="@dimen/text_phone_title_size" />
+                    android:textSize="@dimen/text_phone_title_size" />-->
+<!--
 
                 <TextView
                     android:id="@+id/shop_goods_hours"
@@ -130,6 +130,7 @@
                     android:layout_alignParentRight="true"
                     android:textColor="@color/phone_text_red"
                     android:textSize="@dimen/text_phone_title_size" />
+-->
 
             </RelativeLayout>
 
@@ -185,7 +186,7 @@
                  android:textSize="@dimen/text_tip_size" />-->
         </LinearLayout>
 
-
+<!--
         <TextView
             android:id="@+id/settlement"
             android:layout_width="100dp"
@@ -204,7 +205,7 @@
             android:gravity="center_vertical|center_horizontal"
             android:text="0元学"
             android:textColor="@color/button_light"
-            android:textSize="@dimen/text_phone_title_size" />
+            android:textSize="@dimen/text_phone_title_size" />-->
 
     </LinearLayout>
 

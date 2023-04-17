@@ -1,5 +1,7 @@
 package com.jiateng.bean;
 
+import com.jiateng.common.utils.PayResult;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +24,17 @@ public class UserInfo {
     private String address;
     private int roleId;
     private int corporationId;
+
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public long getId() {
         return id;
     }

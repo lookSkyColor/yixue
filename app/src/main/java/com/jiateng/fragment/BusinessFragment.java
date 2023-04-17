@@ -62,7 +62,7 @@ public class BusinessFragment extends BaseFragment {
     protected void initData() {
         super.initData();
         shopBusinessName.setText(school.getSchoolName());
-        shopBusinessTime.setText(school.getSchoolContent());
+        shopBusinessTime.setText(school.getSchoolBusinessHours());
         shopBusinessLocal.setText(school.getSchoolAddress());
     }
 }

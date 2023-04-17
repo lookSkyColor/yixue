@@ -9,9 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
+import com.jiateng.activity.GoodsActivity;
 import com.jiateng.activity.LoginActivity;
 import com.jiateng.activity.ShopActivity;
 import com.jiateng.adapter.HomeFragmentAdapter;
@@ -27,6 +29,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -93,7 +96,7 @@ public class HomeFragment extends BaseFragment {
         builder.add("userId", String.valueOf(userId));
         FormBody formBody = builder.build();
         final Request request = new Request.Builder()
-                .post(formBody)
+                .post(formBody).header("token", SharedPreferencesUtil.getString(context,"token",""))
                 .url(Constant.SCHOOL_URL)
                 .build();
         OkHttpClient client = new OkHttpClient.Builder()
@@ -110,14 +113,22 @@ public class HomeFragment extends BaseFragment {
                 if (response.isSuccessful()) {
                     String s = response.body().string();
                     Log.e("TAG", "Post请求String同步响应success==" + s);
-
+                    Map maps = (Map) JSON.parse(s);
+                    if (0 != (int)maps.get("code")){
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        startActivity(intent);
+                        return;
+                    }
                     Gson gson = new Gson();
                     JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<List<School>>>() {
                     }.getType());
+
                     schools = (ArrayList<School>) jsonBean.getResult();
                     adapter.setShopInfoData(schools);
                     recyclerView.post(() -> adapter.notifyDataSetChanged());
                 } else {
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    startActivity(intent);
                     Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
                 }
             }
@@ -130,7 +141,7 @@ public class HomeFragment extends BaseFragment {
         builder.add("corporationId", String.valueOf(corporationId));
         FormBody formBody = builder.build();
         final Request request = new Request.Builder()
-                .post(formBody)
+                .post(formBody).header("token", SharedPreferencesUtil.getString(context,"token",""))
                 .url(Constant.BANNER_URL)
                 .build();
         OkHttpClient client = new OkHttpClient.Builder()
@@ -147,7 +158,12 @@ public class HomeFragment extends BaseFragment {
                 if (response.isSuccessful()) {
                     String s = response.body().string();
                     Log.e("TAG", "Post请求String同步响应success==" + s);
-
+                    Map maps = (Map) JSON.parse(s);
+                    if (0 != (int)maps.get("code")){
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        startActivity(intent);
+                        return;
+                    }
                     Gson gson = new Gson();
                     JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<ArrayList<BannerInfo>>>() {
                     }.getType());
@@ -161,6 +177,8 @@ public class HomeFragment extends BaseFragment {
 
                     }
                 } else {
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    startActivity(intent);
                     Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());
                 }
             }

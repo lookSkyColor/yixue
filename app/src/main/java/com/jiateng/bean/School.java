@@ -27,7 +27,16 @@ public class School implements Serializable {
     private Date updateTime;
     @SerializedName("goodsList")
     private List<Subject> goodsList;
+    @SerializedName("schoolBusinessHours")
+    private String schoolBusinessHours;
 
+    public String getSchoolBusinessHours() {
+        return schoolBusinessHours;
+    }
+
+    public void setSchoolBusinessHours(String schoolBusinessHours) {
+        this.schoolBusinessHours = schoolBusinessHours;
+    }
 
     public List<Subject> getGoodsList() {
         return goodsList;
