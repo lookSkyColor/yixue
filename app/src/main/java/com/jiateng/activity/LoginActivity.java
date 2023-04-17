@@ -3,6 +3,7 @@ package com.jiateng.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -149,26 +150,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
                         if (0 != jsonBean.getCode()){
+                            Looper.prepare();
                             Toast.makeText(LoginActivity.this, jsonBean.getMsg(), Toast.LENGTH_SHORT).show();
-                            return;
+                            Looper.loop();
+                        }else {
+                            UserInfo userInfo = (UserInfo) jsonBean.getResult();
+                            SharedPreferencesUtil.putLong(LoginActivity.this,"userId",userInfo.getId());
+                            SharedPreferencesUtil.putString(LoginActivity.this,"iphone",replaceMiddle(phoneNums));
+                            if (0 != userInfo.getCorporationId()){
+                                SharedPreferencesUtil.putInt(LoginActivity.this,"corporationId",userInfo.getCorporationId());
+                            }
+                            if (0 != userInfo.getRoleId()){
+                                SharedPreferencesUtil.putInt(LoginActivity.this,"roleId",userInfo.getRoleId());
+                            }
+                            SharedPreferencesUtil.putString(LoginActivity.this,"token",userInfo.getToken());
+                            Intent intent = new Intent();
+                            //setClass函数的第一个参数是一个Context对象
+                            //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象
+                            //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
+                            intent.setClass(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
                         }
-
-                          UserInfo userInfo = (UserInfo) jsonBean.getResult();
-                          SharedPreferencesUtil.putLong(LoginActivity.this,"userId",userInfo.getId());
-                          SharedPreferencesUtil.putString(LoginActivity.this,"iphone",replaceMiddle(phoneNums));
-                          if (0 != userInfo.getCorporationId()){
-                              SharedPreferencesUtil.putInt(LoginActivity.this,"corporationId",userInfo.getCorporationId());
-                          }
-                          if (0 != userInfo.getRoleId()){
-                              SharedPreferencesUtil.putInt(LoginActivity.this,"roleId",userInfo.getRoleId());
-                          }
-                          SharedPreferencesUtil.putString(LoginActivity.this,"token",userInfo.getToken());
-                          Intent intent = new Intent();
-                          //setClass函数的第一个参数是一个Context对象
-                          //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象
-                          //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
-                          intent.setClass(LoginActivity.this, MainActivity.class);
-                          startActivity(intent);
 
                       } else {
                         Log.e("TAG", "Post请求String同步响应failure==" + response.body().string());

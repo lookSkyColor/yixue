@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
@@ -37,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -94,7 +96,12 @@ public class OrderFragment extends BaseFragment implements OrderAdapter.OrderIte
                 if (response.isSuccessful()) {
                     String s = response.body().string();
                     Log.e("TAG", "Post请求String同步响应success==" + s);
-
+                    Map maps = (Map) JSON.parse(s);
+                    if (0 != (int)maps.get("code")){
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        startActivity(intent);
+                        return;
+                    }
                     Gson gson = new Gson();
                     JsonBean jsonBean = gson.fromJson(s, new TypeToken<JsonBean<List<OrderListType>>>() {
                     }.getType());
