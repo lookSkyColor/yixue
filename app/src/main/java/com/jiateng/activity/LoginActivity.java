@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jiateng.R;
 import com.jiateng.bean.JsonBean;
 import com.jiateng.bean.UserInfo;
+import com.jiateng.common.Constant;
 import com.jiateng.common.utils.SharedPreferencesUtil;
 import com.jiateng.common.widget.AppTitleView;
 import com.lidroid.xutils.ViewUtils;
@@ -130,7 +131,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         RequestBody requestBody = RequestBody.create("{"+"\"iphone\":"+phoneNums+","+"\"code\":"+code+"}", MediaType.parse("application/json; charset=utf-8"));
         final Request request = new Request.Builder()
                 .post(requestBody)
-                .url("http://192.168.0.128:8080/login/login")
+                .url(Constant.LOGIN_URL)
                 .build();
 
         new Thread(new Runnable() {
